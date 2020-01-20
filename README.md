@@ -10,7 +10,7 @@
 
 **[Script de lancement de l'instance - (start.sh)](#startsh)**
 
-**[Mise à jour de la base de données](#miseàjourdelabasededonnées)**
+**[Mise à jour de la base de données](#mise-à-jour-de-la-base-de-données)**
 
 ## Remarque globale
 
@@ -38,6 +38,12 @@ Permettant de faire tourner (à titre indicatif) :
 - 1 instance Traefik,
 - 1 instance Redis,
 - 8-16 instances Addok.
+
+### Limitation actuelle
+
+En l'état actuel, il n'est possible de lier les conteneurs addok qu'à un seul conteneur redis.
+
+Toute aide et/ou compétence sur le sujet est la bienvenue.
 
 ## Monitoring
 
