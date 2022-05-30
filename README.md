@@ -208,9 +208,20 @@ docker ps
 dans ce cas, il faut utiliser la commande :
 
 ```sh
-docker-compose -f addok/addok-compose.yml up --scale addok=X --scale addok-redis=Y -d
+docker-compose -f /opt/geocoding/addok/addok-compose.yml up --scale addok=X --scale addok-redis=Y -d
 ```
 
 où X et Y sont les nombres de conteneurs, respectivement d'addok et de redis.
 
 Dans le cas-où, traefik ne fonctionnerait plus et que son réseau ne serait plus existant, il faut utiliser le script **start.sh**.
+
+### Désactiver les logs
+
+Par défaut chaque requête reçue par l'API est loggée par Docker.
+Pour désactiver ce comportement, modifier le fichier [addok/addok-compose.yml](addok/addok-compose.yml) :
+```
+services:
+    environment:
+      - LOG_QUERIES=0
+```
+Puis redemarrer l'intance.
