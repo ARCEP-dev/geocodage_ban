@@ -12,7 +12,7 @@ services:
     - ./addok-data/addok.db:/data/addok.db
     - ./logs:/logs
     links:
-    - addok-redis:redis
+    - addok-redis
     environment:
       - WORKERS=8
       - LOG_QUERIES=1
@@ -30,7 +30,9 @@ services:
     image: etalab/addok-redis
     restart: unless-stopped
     networks:
-      - traefik
+      traefik:
+        aliases:
+          - redis
     volumes:
     - ./addok-data/dump.rdb:/data/dump.rdb
     labels:
