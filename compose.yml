@@ -1,0 +1,53 @@
+services:
+  proxy:
+    image: traefik:v3.6
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+      - "--entryPoints.web.address=:80"
+    ports:
+      - 80:80
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+
+  addok:
+    image: etalab/addok
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ./addok-data/addok.conf:/etc/addok/addok.conf
+      - ./addok-data/addok.db:/data/addok.db
+      - ./logs:/logs
+    links:
+      - addok-redis
+    environment:
+      - WORKERS=8
+      - LOG_QUERIES=1
+      - LOG_NOT_FOUND=1
+      - SLOW_QUERIES=200
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.addok.entrypoints=web"
+      - "traefik.http.routers.addok.rule=HostRegexp(`.+`)"
+
+  addok-redis:
+    image: etalab/addok-redis
+    restart: unless-stopped
+    networks:
+      proxy:
+        aliases:
+          - redis
+    volumes:
+      - ./addok-data/dump.rdb:/data/dump.rdb
+
+networks:
+  proxy:
+    name: proxy

@@ -17,10 +17,10 @@
 Ce dépôt a pour vocation à préparer, le plus automatiquement possible, un serveur pour en faire une machine de géocodage.
 
 L'API de géocodage sera exposée sur l'URL :
-http://server_ip/addok/search/
+http://server_ip/search/
 
 Exemple :
-http://server_ip/addok/search/?q=14+rue+Gerty+Archim%C3%A8de+75012+Paris&limit=1
+http://server_ip/search/?q=14+rue+Gerty+Archim%C3%A8de+75012+Paris&limit=1
 
 ### Prérequis matériels
 
@@ -167,7 +167,7 @@ Il peut être nécessaire de mettre à jour l'instance de géocodage avec des do
 
 ### Arrêt de l'instance en cours
 ```sh
-docker-compose -f /opt/geocoding/addok/addok-compose.yml down
+docker-compose -f /opt/geocodage/compose.yml down
 ```
 
 ### Remplacement de la base de données
@@ -181,9 +181,9 @@ mkdir  /tmp/data
 unzip -d /tmp/data /tmp/addok-france-bundle.zip
 
 # Déplacement des fichiers dans le répertoire de l'instance
-sudo mv /tmp/data/* /opt/geocoding/addok/addok-data/
+sudo mv /tmp/data/* /opt/geocodage/addok-data/
 
-sudo chown debian:root /opt/geocoding/addok/addok-data/*
+sudo chown debian:root /opt/geocodage/addok-data/*
 
 # Suppression de l'archive
 rm /tmp/addok-france-bundle.zip
@@ -191,34 +191,15 @@ rm /tmp/addok-france-bundle.zip
 
 ### Redémarrage de l'instance
 
-Il y a deux façons de faire.
-
-Si l'instance a été stoppée via :
-
 ```sh
-docker-compose -f /opt/geocoding/addok/addok-compose.yml down
+docker-compose -f /opt/geocodage/compose.yml up --scale addok=X --scale addok-redis=Y -d
 ```
-
-alors, le réseau **traefik** existe toujours (car il est externe) et le conteneur **traefik** est toujours en fonctionnement, ce qui peut se vérifier via
-
-```sh
-docker ps
-```
-
-dans ce cas, il faut utiliser la commande :
-
-```sh
-docker-compose -f /opt/geocoding/addok/addok-compose.yml up --scale addok=X --scale addok-redis=Y -d
-```
-
 où X et Y sont les nombres de conteneurs, respectivement d'addok et de redis.
-
-Dans le cas-où, traefik ne fonctionnerait plus et que son réseau ne serait plus existant, il faut utiliser le script **start.sh**.
 
 ### Désactiver les logs
 
 Par défaut chaque requête reçue par l'API est loggée par Docker.
-Pour désactiver ce comportement, modifier le fichier [addok/addok-compose.yml](addok/addok-compose.yml) :
+Pour désactiver ce comportement, modifier le fichier [compose.yml](compose.yml) :
 ```
 services:
     environment:
