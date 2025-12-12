@@ -14,7 +14,8 @@
 
 ## Remarque globale
 
-Ce dépôt a pour vocation à préparer, le plus automatiquement possible, un serveur pour en faire une machine de géocodage.
+Ce dépôt a pour vocation à préparer, le plus automatiquement possible, un serveur pour en faire une machine de 
+géocodage.
 
 L'API de géocodage sera exposée sur l'URL :
 http://server_ip/addok/search/
@@ -47,7 +48,8 @@ Toute aide et/ou compétence sur le sujet est la bienvenue.
 
 ## Monitoring
 
-Afin de vérifier que les resources matérielles sont utilisées le plus optimalement possible sans saturation, il est intéressant de monitorer le serveur ainsi que les conteneurs Docker.
+Afin de vérifier que les resources matérielles sont utilisées le plus optimalement possible sans saturation, il est 
+intéressant de monitorer le serveur ainsi que les conteneurs Docker.
 
 ### Pour le serveur
 
@@ -57,11 +59,13 @@ htop
 
 Permet de voir l'utilisation de la RAM, l'utilisation de l'ensemble des CPU.
 
-Lors du lancement de l'instance de géocodage, il est possible de constater le chargement en RAM par Redis de la base de données BAN.
+Lors du lancement de l'instance de géocodage, il est possible de constater le chargement en RAM par Redis de la base de 
+données BAN.
 
 ### Pour Docker
 
-La commande **docker stats**, permet de voir, pour chaque conteneur lancé, l'utilisation de la RAM, du CPU, le trafic réseau, les IO.
+La commande **docker stats**, permet de voir, pour chaque conteneur lancé, l'utilisation de la RAM, du CPU, le trafic 
+réseau, les IO.
 
 Cela permet de vérifier entre autres le niveau d'utilisation des conteneurs.
 
@@ -78,7 +82,7 @@ b4b7399edd6f        addok_addok-redis_1   0.12%               5.007GiB / 28.76Gi
 ce34d9209ff5        traefik_proxy_1       0.03%               15.98MiB / 28.76GiB   0.05%               306GB / 323GB       23.9MB / 0B         28
 ```
 
-La commande **docker ps** permet de lister les conteneurs avec leur id, leur nom, leur status ...
+La commande **docker ps** permet de lister les conteneurs avec leur id, leur nom, leur status…
 
 ```sh
 docker ps
@@ -92,45 +96,6 @@ e0ec7b335f8c        etalab/addok         "/bin/sh -c docker-e…"   2 days ago  
 b4b7399edd6f        etalab/addok-redis   "docker-entrypoint.s…"   2 days ago          Up 2 days           6379/tcp             addok_addok-redis_1
 ce34d9209ff5        traefik:latest       "/traefik --docker -…"   4 months ago        Up 4 months         0.0.0.0:80->80/tcp   traefik_proxy_1
 ```
-
----
-
-## init.sh
-
-Script de préparation du serveur (installation des paquets nécessaires, téléchargement des données et des fichiers de config).
-
-### Prérequis
-
-Exécuter les commandes suivantes afin de télécharger le script sur le serveur :
-```sh
-wget -O ~/init.sh https://raw.githubusercontent.com/ARCEP-dev/geocodage_ban/master/init.sh
-chmod u+x ./init.sh
-```
-
-### Lancement
-```sh
-./init.sh
-```
-
-### Fonctionnement
-
-1. Téléchargement du script de vérification de l'environnement
-1. Vérification que OVERLAY FS soit bien activé
-1. Mise à jour des dépôts et installations
-1. Ajout du dépôt docker
-1. Mise à jour des dépôts et installation de docker
-1. Ajouter le service au démarrage
-1. Ajout de l'utilisateur au groupe docker
-1. Vérification de la version de Docker
-1. Création des répertoires pour l'instance de géocodage
-1. Téléchargement de la dernière version des données BAN
-1. Téléchargement des docker-compose à la sauce Arcep
-1. Téléchargement du script de lancement de l'instance de géocodage
-1. Redémarrage du serveur
-
-Il est nécessaire de fermer et rouvrir sa session pour que les changements de droits soient effectifs. La solution que j'ai choisie est de redémarrer le serveur en fin de script.
-
----
 
 ## start.sh
 
@@ -160,7 +125,8 @@ Il faut veiller à avoir le rapport Redis/Addok correct. Mes tests empiriques do
 
 ## Mise à jour de la base de données
 
-Il peut être nécessaire de mettre à jour l'instance de géocodage avec des données plus récentes de la BAN. Pour ce faire, il faut :
+Il peut être nécessaire de mettre à jour l'instance de géocodage avec des données plus récentes de la BAN. Pour ce 
+faire, il faut :
 1. stopper l'instance en cours,
 1. télécharger la nouvelle base de données,
 1. relancer l'instance.
@@ -181,44 +147,18 @@ mkdir  /tmp/data
 unzip -d /tmp/data /tmp/addok-france-bundle.zip
 
 # Déplacement des fichiers dans le répertoire de l'instance
-sudo mv /tmp/data/* /opt/geocoding/addok/addok-data/
+sudo mv /tmp/data/* /opt/geocoding/addok-data/
 
-sudo chown debian:root /opt/geocoding/addok/addok-data/*
+sudo chown debian:root /opt/geocoding/addok-data/*
 
 # Suppression de l'archive
 rm /tmp/addok-france-bundle.zip
 ```
 
-### Redémarrage de l'instance
-
-Il y a deux façons de faire.
-
-Si l'instance a été stoppée via :
-
-```sh
-docker-compose -f /opt/geocoding/addok/addok-compose.yml down
-```
-
-alors, le réseau **traefik** existe toujours (car il est externe) et le conteneur **traefik** est toujours en fonctionnement, ce qui peut se vérifier via
-
-```sh
-docker ps
-```
-
-dans ce cas, il faut utiliser la commande :
-
-```sh
-docker-compose -f /opt/geocoding/addok/addok-compose.yml up --scale addok=X --scale addok-redis=Y -d
-```
-
-où X et Y sont les nombres de conteneurs, respectivement d'addok et de redis.
-
-Dans le cas-où, traefik ne fonctionnerait plus et que son réseau ne serait plus existant, il faut utiliser le script **start.sh**.
-
 ### Désactiver les logs
 
 Par défaut chaque requête reçue par l'API est loggée par Docker.
-Pour désactiver ce comportement, modifier le fichier [addok/addok-compose.yml](addok/addok-compose.yml) :
+Pour désactiver ce comportement, modifier le fichier [compose.yml](compose.yml) :
 ```
 services:
     environment:
